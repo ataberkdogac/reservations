@@ -27,12 +27,12 @@ for (var i = 0; i < hotels.length; i++){
                 <input type="text" id="name"></input>
                 <label for = "surname">Surname:</label>
                 <input type="text" id="surname"></input>
-                <label for="sd">Start Date:</label>
-                <input type="date" id="sd"></input>
-                <label for="ed">End Date:</label>
-                <input type="date" id="ed"></input>
-                <label for="fee"> Total Fee:</label>
-                <input type="text" id="fee"></input>
+                <label for="start_date">Start Date:</label>
+                <input type="date" id="start_date"></input>
+                <label for="end_date">End Date:</label>
+                <input type="date" id="end_date"></input>
+                <label for="total_fee"> Total Fee:</label>
+                <input type="text" id="total_fee"></input>
                 <label>Status:</label>
                 <input type="radio" id="appr" name = "stt" >Approved</input><br>
                 <input type="radio" id="pend" name = "stt">Pending</input><br>
@@ -41,7 +41,7 @@ for (var i = 0; i < hotels.length; i++){
                 <select id="hotid">
 
                 </select>
-            
+                <button>Save</button>
             </div>
         </span>
     </div>

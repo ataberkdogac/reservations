@@ -4,155 +4,113 @@ import 'gridjs/dist/theme/mermaid.css'
 import { Cell, createElement, Grid, h } from 'gridjs'
 import { ref, onMounted, watchEffect, effect } from 'vue'
 import myModal from './components/v1/vifs/myModal.vue'
+import { reactive } from 'vue'
 
-var reservations = new Array;
-var hotels = new Array;
+var reservations = ref([])
+var hotels = ref([])
+var oldData
 
 watchEffect(() => {
-    fetchHotels();
-    fetchData();
-  
-
+  axios.defaults.baseURL = 'https://682c1d4dd29df7a95be587f9.mockapi.io/api/v1'
 })
 
-
-function fetchData() {
-  axios.get('https://682c1d4dd29df7a95be587f9.mockapi.io/api/v1/reservations').then(function (response) {
-    reservations = response.data;
-    console.log(reservations);
-    printList(reservations);
-  })
+onMounted(() => {
+  fetchHotels()
+  fetchData()
   
+})
+
+const fetchData = async () => {
+  axios.get('/reservations').then(function (response) {
+    reservations.value = response.data
+  })
 }
 
-function fetchHotels() {
-  axios.get('https://682c1d4dd29df7a95be587f9.mockapi.io/api/v1/hotels').then(function (response) {
-    hotels = response.data;
-   
+const fetchHotels = async () => {
+  axios.get('/hotels').then(function (response) {
+    hotels.value = response.data
   })
-  
 }
-
-
 
 function getst(st: any) {
   if (st === 1) {
     return 'Approved'
-  }
-  if (st === 2) {
+  } else if (st === 2) {
     return 'Pending'
-  }
-  if (st === 3) {
+  } else if (st === 3) {
     return 'Canceled'
+  } else {
+    return 'Undefined'
   }
+}
+
+function closeB(id: string) {
+  axios.delete('/reservations/' + id).then(function () {
+    fetchData()
+  })
+}
+
+function editB(id: string) {
+  axios.get('reservations/' + id).then(function (response) {
+    fillModal(response.data)
+  })
+}
+
+function fillModal(data: object) {
+  var mod = document.getElementById('myModal')
+  mod.style.display = 'block'
+
+  var inps = document.getElementsByTagName('input')
+ 
+  document.getElementById('name').value = data.name
+  document.getElementById('surname').value = data.surname
+  document.getElementById('start_date').value = data.start_date
+  document.getElementById('end_date').value = data.end_date
+  document.getElementById('total_fee').value = data.total_fee
+  if (data.status === 1) {
+    document.getElementById('appr').checked = true
+  } else if (data.status === 2) {
+    document.getElementById('pend').checked = true
+  } else {
+    document.getElementById('cacl').checked = true
+  }
+
+  document.getElementById('hotid').value = gethotid(data.hotel_id)
 }
 
 function gethotid(hotid: number) {
-  for (var i = 0; i < hotels.length; i++) {
-    if (hotels[i].id === hotid.toString()) {
-      return hotels[i].name
+   console.log(hotels.value)
+  for (var i = 0; i < hotels.value.length; i++) {
+   
+    if (hotels.value[i].id === hotid.toString()) {
+      return hotels.value[i].name
+    } else if (hotid > hotels.value.length) {
+      return 'Undefined'
     }
   }
-}
-
-
-function editB(row: any){
-  var mod = document.getElementById("myModal");
-  mod.style.display = "block";
-  document.getElementById("name").value = row[1].data;
-  document.getElementById("surname").value = row[2].data;
-  document.getElementById("sd").value = row[3].data;
-  document.getElementById("ed").value = row[4].data;
-  document.getElementById("fee").value = row[5].data;
-  if (row[6].data === 'Approved'){
-    document.getElementById("appr").checked = true;
-  } else if (row[6].data === 'pending') {
-    document.getElementById("pend").checked = true;
-  } else {document.getElementById("cacl").checked = true;}
-
-  document.getElementById("hotid").value = row[7].data;
-  
-
-}
-
-
-
-
-
-function closeB(data: Array<object>) {
-  
-}
-
-function printList(dataAr: any) {
- 
-  new Grid({
-    columns: [
-      { id: 'createdAt', name: 'Created At' },
-      { id: 'name', name: 'Name' },
-      { id: 'surname', name: 'Surname' },
-      { id: 'start_date', name: 'Start Date' },
-      { id: 'end_date', name: 'End Date' },
-      { id: 'total_fee', name: 'Total Fee' },
-      { id: 'status', name: 'Status' },
-      { id: 'hotel_id', name: 'Hotel Name' },
-      {
-        id: 'edit',
-        name: 'Actions',
-        formatter: (cell, row) => {
-          return h(
-            'button',
-            {
-              className: 'py-2 mb-4 px-4 border rounded-md text-white bg-blue-600',
-              onClick: () => editB(row.cells),
-            },
-            'Edit'
-          )
-        },
-      },
-      {
-        id: 'close',
-        name: 'aa',
-        formatter: (cell, row) => {
-          return h(
-            'button',
-            {
-              className: 'py-2 mb-4 px-4 border rounded-md text-white bg-blue-600',
-              onClick: () => closeB(row.cells),
-            },
-            'X'
-          )
-        },
-      },
-    ],
-
-    data: () =>
-      dataAr.map((dataAr:any) => [
-        dataAr.createdAt,
-        dataAr.name,
-        dataAr.surname,
-        dataAr.start_date,
-        dataAr.end_date,
-        dataAr.total_fee,
-        getst(dataAr.status),
-        gethotid(dataAr.hotel_id),
-      ]),
-      search: true,
-      pagination: true,
-      sort: true
-  }).render(document.getElementById("datalist"))
-
-  
 }
 </script>
 
 <template>
-  <my-modal id = "myModal"></my-modal>
-  
-  <table id = "datalist" class="grid">
+  <my-modal id="myModal"></my-modal>
 
+  <table>
+    <tr>
+      <th></th>
+    </tr>
+
+    <tr v-for="item in reservations">
+      <td>{{ item.name }}</td>
+      <td>{{ item.surname }}</td>
+      <td>{{ item.start_date }}</td>
+      <td>{{ item.end_date }}</td>
+      <td>{{ item.total_fee }}</td>
+      <td>{{ getst(item.status) }}</td>
+      <td>{{ gethotid(item.hotel_id) }}</td>
+      <td><button @click="editB(item.id)">Edit</button></td>
+      <td><button @click="closeB(item.id)">X</button></td>
+    </tr>
   </table>
-
-
 </template>
 
 <style></style>
