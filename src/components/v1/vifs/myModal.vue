@@ -1,35 +1,32 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { senddata } from '../../../App.vue';
+
 import axios from 'axios'
 var hotels = new Array;
-
 axios.get('https://682c1d4dd29df7a95be587f9.mockapi.io/api/v1/hotels').
 then(function (response) {
-hotels = response.data;
-var hots = document.getElementById("hotid");
-for (var i = 0; i < hotels.length; i++){
-    var opt = document.createElement("option");
-    opt.append(hotels[i].name)
-    hots?.appendChild(opt)
-}
+    hotels = response.data;
+    var hots = document.getElementById("hotid");
+    for (var i = 0; i < hotels.length; i++){
+        var opt = document.createElement("option");
+        opt.append(hotels[i].name)
+        hots.appendChild(opt)
+    }
 })
-
 
 
 </script>
 
 <template>
     <div id = "myModal" class="myModal">
-        <span class="close-button">
+        
             <div class="modal-content">
-                <label for = "name">Name:</label>
+                <label for = "name" required>Name:</label>
                 <input type="text" id="name"></input>
                 <label for = "surname">Surname:</label>
                 <input type="text" id="surname"></input>
                 <label for="start_date">Start Date:</label>
                 <input type="date" id="start_date"></input>
-                <label for="end_date">End Date:</label>
+                <label for="end_date" required>End Date:</label>
                 <input type="date" id="end_date"></input>
                 <label for="total_fee"> Total Fee:</label>
                 <input type="text" id="total_fee"></input>
@@ -37,46 +34,55 @@ for (var i = 0; i < hotels.length; i++){
                 <input type="radio" id="appr" name = "stt" >Approved</input><br>
                 <input type="radio" id="pend" name = "stt">Pending</input><br>
                 <input type="radio" id="cacl" name = "stt">Cancelled</input><br>
-                Hotel Name:
+                <label>Hotel Name:</label>
                 <select id="hotid">
-
+                <option value="">Select an Hotal...</option>
                 </select>
-                <button>Save</button>
+                <button id="closeModal" class="closeModal">Save</button>
             </div>
-        </span>
+        
     </div>
 </template>
 <style>
     .myModal {
         display: none;
-        z-index: 1;
-        background-color: rgba(0, 0, 0, 0.6);
-        position: absolute;
+        background-color: rgba(0, 0, 0, 0.8);
         width: 100%;
         height: 100%;
+        position: fixed; 
+        z-index: 1;
+        
     }
 
-    .myModal div{
+    .modal-content{
         text-align: left;
-        display: block;
-        width: 40%;
+        max-width: 300px;
+        min-width: 20%;
         margin: auto;
-        margin-top: 10%;
-        border: solid 2px black;
-        border-radius: 10px;
+        margin-top: 6%;
         background-color: black;
         padding: 10px;
         
     }
 
     input {
-       
-        
         margin: 10px;
-        
     }
+
     label {
         display: block;
+        margin: 5px;
+        margin-bottom: 0px;
+    }
+
+    button {
+        display:block;
+        
+        margin: 10px;
+    }
+
+    select{
+        margin: 5px;
     }
     
     

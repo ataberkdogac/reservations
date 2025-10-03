@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import axios from 'axios'
 import 'gridjs/dist/theme/mermaid.css'
-import { Cell, createElement, Grid, h } from 'gridjs'
 import { ref, onMounted, watchEffect, effect } from 'vue'
 import myModal from './components/v1/vifs/myModal.vue'
+
 import { reactive } from 'vue'
+import axios from 'axios'
 
 var reservations = ref([])
 var hotels = ref([])
-var oldData
 
 watchEffect(() => {
   axios.defaults.baseURL = 'https://682c1d4dd29df7a95be587f9.mockapi.io/api/v1'
@@ -17,7 +16,6 @@ watchEffect(() => {
 onMounted(() => {
   fetchHotels()
   fetchData()
-  
 })
 
 const fetchData = async () => {
@@ -56,12 +54,10 @@ function editB(id: string) {
   })
 }
 
-function fillModal(data: object) {
+function fillModal(data: any) {
+  console.log('in modal to edit')
   var mod = document.getElementById('myModal')
   mod.style.display = 'block'
-
-  var inps = document.getElementsByTagName('input')
- 
   document.getElementById('name').value = data.name
   document.getElementById('surname').value = data.surname
   document.getElementById('start_date').value = data.start_date
@@ -76,12 +72,28 @@ function fillModal(data: object) {
   }
 
   document.getElementById('hotid').value = gethotid(data.hotel_id)
+  var cbut = document.getElementById('closeModal')
+  cbut.onclick = function () {
+    updateList(data)
+  }
+}
+
+function emptyModal() {
+  var inpList = document.getElementsByTagName('input')
+  for (var i = 0; i < inpList.length; i++) {
+    inpList[i].value = null
+  }
+  console.log('in modal for add')
+  var mod = document.getElementById('myModal')
+  mod.style.display = 'block'
+  var cbut = document.getElementById('closeModal')
+  cbut.onclick = function () {
+    newRes()
+  }
 }
 
 function gethotid(hotid: number) {
-   console.log(hotels.value)
   for (var i = 0; i < hotels.value.length; i++) {
-   
     if (hotels.value[i].id === hotid.toString()) {
       return hotels.value[i].name
     } else if (hotid > hotels.value.length) {
@@ -89,14 +101,69 @@ function gethotid(hotid: number) {
     }
   }
 }
+
+function dataFromModal(data: object){
+  data.name = document.getElementById('name').value
+  data.surname = document.getElementById('surname').value
+  data.start_date = document.getElementById('start_date').value
+  data.end_date = document.getElementById('end_date').value
+  data.total_fee = document.getElementById('total_fee').value
+  if (document.getElementById('appr')) {
+    data.status = 1
+  } else if (document.getElementById('pend')) {
+    data.status = 2
+  } else {
+    data.status = 3
+  }
+  return data
+}
+
+function updateList(data: object) {
+  var mod = document.getElementById('myModal')
+  mod.style.display = 'none'
+  data = dataFromModal(data);
+  console.log('/reservations/' + data.id)
+  axios({
+  method: 'put',
+  url: '/reservations/' + data.id,
+  data: data,
+}).then(function(){
+  fetchData()
+})
+  console.log(data)
+  console.log('exit from edit')
+}
+
+function newRes() {
+  var data = new Object
+  data = dataFromModal(data)
+  var mod = document.getElementById('myModal')
+  mod.style.display = 'none'
+  axios({
+  method: 'post',
+  url: '/reservations',
+  data: data,
+}).then(function(){
+  fetchData()
+})
+  console.log(data)
+  console.log('exit from newres')
+}
 </script>
 
 <template>
-  <my-modal id="myModal"></my-modal>
+  <my-modal id="myModal" class="myModal"> </my-modal>
 
   <table>
     <tr>
-      <th></th>
+      <th>Name</th>
+      <th>Surname</th>
+      <th>Start Date</th>
+      <th>End Date</th>
+      <th>Total Fee</th>
+      <th>Status</th>
+      <th>Hotel</th>
+      <th><button id="addBtn" @click="emptyModal()">ADD</button></th>
     </tr>
 
     <tr v-for="item in reservations">
@@ -113,4 +180,6 @@ function gethotid(hotid: number) {
   </table>
 </template>
 
-<style></style>
+<style>
+
+</style>
