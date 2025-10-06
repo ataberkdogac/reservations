@@ -36,7 +36,7 @@ then(function (response) {
                 <input type="radio" id="cacl" name = "stt">Cancelled</input><br>
                 <label>Hotel Name:</label>
                 <select id="hotid">
-                <option value="">Select an Hotel...</option>
+                
                 </select>
                 <button id="closeModal" class="closeModal">Save</button>
             </div>
@@ -45,6 +45,7 @@ then(function (response) {
 </template>
 <style>
     .myModal {
+        
         display: none;
         background-color: rgba(0,0,0, 0.8);
         width: 100%;
@@ -55,19 +56,20 @@ then(function (response) {
     }
 
     .modal-content{
+        border-radius: 20px;
         text-align: left;
         max-width: 300px;
         min-width: 20%;
         margin: auto;
         margin-top: 6%;
-        background-color: rgb(255, 202, 26);
+        background-color: rgb(188,184,178);
         padding: 10px;
         
     }
 
-    input {
+    .myModal input {
         margin: 10px;
-        background-color: rgb(255, 238, 140);
+        background-color: rgb(239,235,233);
         color: black;
     }
 
@@ -77,15 +79,15 @@ then(function (response) {
         margin-bottom: 0px;
     }
 
-    button {
+    .myModal button {
         display:block;
         margin: 10px;
-        
+        background-color: orange;
     }
 
     select{
         margin: 5px;
-        background-color: rgb(255, 238, 140);
+        background-color: rgb(239,235,233);
         color: black;
     }
     
